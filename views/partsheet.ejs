@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+	<head>
+		<meta charset="utf-8">
+		<title>McMaster Scraping</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="icon" type="image/png" href="/images/favicon.ico" />
+		<link rel="stylesheet" href="/css/bootstrap.css">
+		<link rel="stylesheet" href="/css/main.css">
+	</head>
+<body>
+	<div class="container">
+		<div class="head">
+			<h2>Bill of Materials</h2>
+			<div class="actions">
+				<button class="btn btn-primary" id="get-price" type="submit">Get Prices</button>
+				<button class="btn btn-success" id="export-table" type="submit">Export Table</button>
+				<a href="/" class="btn btn-primary">Upload another file</a>
+			</div>
+		</div>
+		<!-- UGLY -->
+		<table class="table striped-table table-striped table-bordered table-hover">
+				<% var partNumbers = {}; %>
+				<% for(var i=0; i<params.data.length; i++) { %>
+					<% if(i == 0) { %>
+						<thead>
+						<tr id="<%= i %>">
+					<% } else if (i == 1) { %>
+						<tbody>
+						<tr id="<%= i %>">
+					<% } else { %>
+						<tr id="<%= i %>">
+					<% } %>
+					<% for(var j=0; j<params.data[i].length; j++) { %>
+						<% if(i == 0) { %>
+							<th><%= params.data[i][j] %></th>
+						<% } else if(j == params.partNumberIndex) { %>
+							<% partNumbers[params.data[i][j]] = i %>
+							<td class="part-number"><%= params.data[i][j] %></td>
+						<% } else if(j == params.priceIndex) { %>
+							<td class="price"><%= params.data[i][j] %></td>
+						<% } else if(j == params.pkgQtyIndex) { %>
+							<td class="pkg-qty"><%= params.data[i][j] %></td>
+						<% } else if(j == params.quantityIndex) { %>
+							<td class="quantity"><%= params.data[i][j] %></td>
+						<% } else if(j == params.totalIndex) { %>
+							<td class="total"><%= params.data[i][j] %></td>
+						<% } else { %>
+							<td><%= params.data[i][j] %></td>
+						<% } %>
+					<% } %>
+						<% if(i == 0) { %>
+							<th>Catalog URL</th>
+						<% } else { %>
+							<td class="catalog-url"></td>
+						<% } %>
+					</tr>
+					<% if(i == 0) { %>
+						</thead>
+					<% } %>
+				<% } %>
+			</tbody>
+		</table>
+	</div>
+<script type="text/javascript" src="/js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="/js/tableExport.js"></script>
+<script type="text/javascript" src="/js/jquery.base64.js"></script>
+<script type="text/javascript" src="/js/site.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		var partNumbers = <%- JSON.stringify(partNumbers) %>;
+		McMaster.initSpreadsheet(partNumbers);
+	});
+</script>
+</body>
+</html>
